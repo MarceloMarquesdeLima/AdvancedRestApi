@@ -2,7 +2,6 @@
 using AdvancedRestApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace AdvancedRestApi.Controllers
 {
@@ -19,37 +18,62 @@ namespace AdvancedRestApi.Controllers
 
         // GET: api/<UserController>
         [HttpGet]
-        public async Task<IEnumerable<User>> Get()
+        public async Task<IActionResult> Get()
         {
-            return await _userService.GetAllUsers();
+            var result = await _userService.GetAllUsers();
+            if (result.IsSuccess)
+            {
+                return Ok(result.User);
+            }
+            return NotFound(result.ErrorMessage);
         }
 
         // GET api/<UserController>/5
         [HttpGet("{id}")]
-        public async Task<User> Get(Guid id)
+        public async Task<IActionResult> Get(Guid id)
         {
-            return await _userService.GetUserById(id);
+            var result = await _userService.GetUserById(id);
+            if(result.IsSuccess)
+            {
+                return Ok(result.User); 
+            }
+            return NotFound(result.ErrorMessage);
         }
 
         // POST api/<UserController>
         [HttpPost]
-        public async Task Post([FromBody] User user)
+        public async Task<IActionResult> Post([FromBody] User user)
         {
-            await _userService.AddUser(user);
+            var result = await _userService.AddUser(user);
+            if(result.IsSuccess)
+            {
+                return StatusCode(StatusCodes.Status201Created);
+            }
+            return BadRequest(result.ErrorMessage);
         }
 
         // PUT api/<UserController>/5
         [HttpPut("{id}")]
-        public async Task Put(Guid id, [FromBody] User user)
+        public async Task<IActionResult> Put(Guid id, [FromBody] User user)
         {
-            await _userService.UpdateUser(id, user);
+            var result = await _userService.UpdateUser(id, user);
+            if(result.IsSuccess )
+            {
+                return NoContent();
+            }
+            return BadRequest(result.ErrorMessage);
         }
 
         // DELETE api/<UserController>/5
         [HttpDelete("{id}")]
-        public async Task Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            await _userService.DeleteUser(id);
+            var result = await _userService.DeleteUser(id);
+            if(result.IsSuccess )
+            {
+                return NoContent();
+            }
+            return BadRequest(result.ErrorMessage);
         }
     }
 }
