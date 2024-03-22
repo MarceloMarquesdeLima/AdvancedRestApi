@@ -1,23 +1,29 @@
 ﻿using AdvancedRestApi.Data;
+using AdvancedRestApi.DTOs;
 using AdvancedRestApi.Interfaces;
 using AdvancedRestApi.Models;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace AdvancedRestApi.Services
 {
     public class UserService : IUser
     {
         private UserDbContext _dbContext;
+        private IMapper _mapper;
 
-        public UserService(UserDbContext dbContext)
+        public UserService(UserDbContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
+            _mapper = mapper;
         }
 
-        public async Task<(bool IsSuccess, string ErrorMessage)> AddUser(User user)
+        public async Task<(bool IsSuccess, string ErrorMessage)> AddUser(UserDTO userdto)
         {
-            if(user != null)
+            if(userdto != null)
             {
+                var user = _mapper.Map<User>(userdto);
                 await _dbContext.AddAsync(user);
                 await _dbContext.SaveChangesAsync();
                 return (true, null);
@@ -37,31 +43,34 @@ namespace AdvancedRestApi.Services
             return (false, "Usuário não encontrado.");
         }
 
-        public async Task<(bool IsSuccess, List<User> User, string ErrorMessage)> GetAllUsers()
+        public async Task<(bool IsSuccess, List<UserDTO> User, string ErrorMessage)> GetAllUsers()
         {
             var users = await _dbContext.Users.ToListAsync();
             if(users != null)
             {
-                return (true, users, null);
+                var result = _mapper.Map<List<UserDTO>>(users);
+                return (true, result, null);
             }
             return (false,null,"Usuários não encontrados");
         }
 
-        public async Task<(bool IsSuccess, User User, string ErrorMessage)> GetUserById(Guid id)
+        public async Task<(bool IsSuccess, UserDTO User, string ErrorMessage)> GetUserById(Guid id)
         {
             var user = await _dbContext.Users.FindAsync(id);
             if(user != null)
             {
-                return (true, user, null);
+                var result = _mapper.Map<UserDTO>(user);
+                return (true, result, null);
             }
             return (false, null, "Usuário não encontrado" );
         }
 
-        public async Task<(bool IsSuccess, string ErrorMessage)> UpdateUser(Guid id, User user)
+        public async Task<(bool IsSuccess, string ErrorMessage)> UpdateUser(Guid id, UserDTO userdto)
         {
             var userObj = await _dbContext.Users.FindAsync(id);
             if(userObj != null)
             {
+                var user = _mapper.Map<User>(userdto);
                 userObj.Name = user.Name;
                 userObj.Address = user.Address;
                 userObj.Phone = user.Phone;
