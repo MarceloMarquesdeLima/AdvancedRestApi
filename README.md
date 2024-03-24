@@ -1,4 +1,4 @@
-# O Projeto AdvancedRestApiMongo 👋
+# O Projeto AdvancedRestApi 👋
 
 - 📫 Trabalhando com Back-end: C#.NET
 - 📫 Banco de Dados: SQL Server
